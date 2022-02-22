@@ -7,6 +7,7 @@
     tools:context=".ui.setting.SettingFragment">
 
     <RelativeLayout
+        android:id="@+id/relativeLayout"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="@color/colorPrimary"
@@ -23,5 +24,73 @@
             android:textColor="@color/white"
             android:textSize="18sp" />
     </RelativeLayout>
+
+    <ScrollView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/relativeLayout">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="1px"
+                android:layout_marginTop="15dp"
+                android:background="@color/split_line" />
+
+            <com.example.jetpackdemo.ui.widget.LSettingItem
+                android:id="@+id/fw_version"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:LtextColor="@color/black"
+                app:LtextSize="@dimen/setting_item_left"
+                app:isShowRightText="true"
+                app:leftText="@string/device_version"
+                app:rightStyle="iconHide"
+                app:rightText=""
+                app:rightTextSize="@dimen/setting_item_right" />
+
+            <com.example.jetpackdemo.ui.widget.LSettingItem
+                android:id="@+id/sys_lang"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:LtextColor="@color/black"
+                app:LtextSize="@dimen/setting_item_left"
+                app:isShowRightText="true"
+                app:leftText="@string/sys_lang"
+                app:rightStyle="iconHide"
+                app:rightText=""
+                app:rightTextSize="@dimen/setting_item_right" />
+
+            <com.example.jetpackdemo.ui.widget.LSettingItem
+                android:id="@+id/unit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:LtextColor="@color/black"
+                app:LtextSize="@dimen/setting_item_left"
+                app:isShowRightText="true"
+                app:leftText="@string/unit"
+                app:rightText=""
+                app:rightTextSize="@dimen/setting_item_right" />
+
+            <com.example.jetpackdemo.ui.widget.LSettingItem
+                android:id="@+id/wifi"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:LtextColor="@color/black"
+                app:LtextSize="@dimen/setting_item_left"
+                app:isShowRightText="true"
+                app:leftText="@string/wifi_name"
+                app:rightText=""
+                app:rightTextSize="@dimen/setting_item_right" />
+
+        </LinearLayout>
+    </ScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
