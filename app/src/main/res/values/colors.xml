@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="purple_200">#FFBB86FC</color>
+    <color name="purple_500">#FF6200EE</color>
+    <color name="purple_700">#FF3700B3</color>
+    <color name="teal_200">#FF03DAC5</color>
+    <color name="teal_700">#FF018786</color>
+
+    <color name="colorPrimary">#FF6900</color>
+    <color name="colorPrimaryDark">#FF6900</color>
+    <color name="colorAccent">#FF6900</color>
+
+    <color name="white">#ffffff</color>
+    <color name="alpha_white">#66ffffff</color>
+    <color name="black">#000000</color>
+    <color name="split_line">#808080</color>
+    <color name="cali_title_bg">#66000000</color>
+    <color name="toast_bg">#EE3b3e4d</color>
+    <color name="toast_bord">@color/toast_bg</color>
+    <color name="red">#ff0000</color>
+    <color name="tab_layout_bg">#F5F5F5</color>
+    <color name="connected_bg">#F0F0F5</color>
+    <color name="btn_red_background_normal">#FFff3a00</color>
+    <color name="cover">#80000000</color>
+    <color name="transparent">#00000000</color>
+    <color name="bar_used">#FF00BB00</color>
+    <color name="bar_green">#FF00BB00</color>
+    <color name="bar_red">#FFff3a00</color>
+    <color name="collapse_bg">#F0F0F0</color>
+    <color name="expand_bg">#FFDEC7</color>
+    <color name="black_alpha">#B3000000</color>
+    <color name="bg_color_alpha">#B3f2f2f2</color>
+
+    <color name="dialog_stroke">#3b3e4d</color>
+    <color name="dialog_background">#ffffff</color>
+    <color name="dialog_title">#000000</color>
+    <color name="grey">#808080</color>
+    <color name="item_divide">#51535e</color>
+    <color name="button_press_font_color">#9f000000</color>
+    <color name="button_font_color">#000000</color>
+
+    <!--    test-->
+    <color name="bar_outline">#FFFFFFFF</color>
+    <color name="sigview_background">#FF222222</color>
+    <color name="gray">#FF909090</color>
+    <color name="grid">#FFDDDDDD</color>
+    <color name="skyview_text_color">#FFFFFFFF</color>
+    <color name="skyview_background">#FF4444DD</color>
+
+
+    <color name="item_split">#99999999</color>
+    <color name="cam_sketch">#3d4348</color>
+
+    <color name="set_lines_view_bg">#333333</color>
+    <color name="item_selected">#ffd800</color>
+    <color name="unclick">#a8a8a8</color>
+</resources>

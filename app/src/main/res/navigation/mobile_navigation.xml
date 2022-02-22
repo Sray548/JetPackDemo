@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@id/navigation_camera">
+
+    <fragment
+        android:id="@+id/navigation_camera"
+        android:name="com.example.jetpackdemo.ui.live.LiveFragment"
+        android:label="@string/tab_camera"
+        tools:layout="@layout/fragment_camera" />
+
+    <fragment
+        android:id="@+id/navigation_setttings"
+        android:name="com.example.jetpackdemo.ui.setting.SettingFragment"
+        android:label="@string/tab_setting"
+        tools:layout="@layout/fragment_setting" />
+
+    <fragment
+        android:id="@+id/navigation_album"
+        android:name="com.example.jetpackdemo.ui.album.AlbumFragment"
+        android:label="@string/tab_album"
+        tools:layout="@layout/fragment_album" />
+
+    <fragment
+        android:id="@+id/navigation_info"
+        android:name="com.example.jetpackdemo.ui.info.InfoFragment"
+        android:label="@string/tab_info"
+        tools:layout="@layout/fragment_info" />
+</navigation>

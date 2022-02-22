@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/navigation_camera"
+        android:icon="@drawable/live"
+        android:title="@string/tab_camera" />
+
+    <item
+        android:id="@+id/navigation_setttings"
+        android:icon="@drawable/settings"
+        android:title="@string/tab_setting" />
+
+    <item
+        android:id="@+id/navigation_album"
+        android:icon="@drawable/album"
+        android:title="@string/tab_album" />
+    <item
+        android:id="@+id/navigation_info"
+        android:icon="@drawable/info"
+        android:title="@string/tab_info" />
+
+</menu>
