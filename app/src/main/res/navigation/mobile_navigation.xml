@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/navigation_camera"
-        android:name="com.example.jetpackdemo.ui.live.LiveFragment"
+        android:name="com.example.jetpackdemo.ui.live.CameraFragment"
         android:label="@string/tab_camera"
         tools:layout="@layout/fragment_camera" />
 

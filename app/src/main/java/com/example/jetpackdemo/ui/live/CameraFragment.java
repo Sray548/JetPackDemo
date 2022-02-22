@@ -13,7 +13,7 @@ import androidx.lifecycle.ViewModelProvider;
 import com.example.jetpackdemo.databinding.FragmentCameraBinding;
 
 
-public class LiveFragment extends Fragment {
+public class CameraFragment extends Fragment {
 
     private FragmentCameraBinding binding;
 
@@ -25,8 +25,6 @@ public class LiveFragment extends Fragment {
         binding = FragmentCameraBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        final TextView textView = binding.textHome;
-        liveViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
         return root;
     }
 

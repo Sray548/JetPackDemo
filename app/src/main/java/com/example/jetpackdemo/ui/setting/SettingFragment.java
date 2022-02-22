@@ -25,8 +25,6 @@ public class SettingFragment extends Fragment {
         binding = FragmentSettingBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        final TextView textView = binding.textDashboard;
-        settingViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
         return root;
     }
 

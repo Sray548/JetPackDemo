@@ -25,8 +25,6 @@ public class AlbumFragment extends Fragment {
         binding = FragmentAlbumBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        final TextView textView = binding.textNotifications;
-        albumViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
         return root;
     }
 
