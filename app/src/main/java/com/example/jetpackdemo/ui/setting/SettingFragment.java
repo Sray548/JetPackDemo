@@ -6,13 +6,14 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.jetpackdemo.databinding.FragmentSettingBinding;
+import com.example.jetpackdemo.util.log.Logger;
 
 public class SettingFragment extends Fragment {
+    private Logger mLog = Logger.create("SettingFragment");
 
     private SettingViewModel settingViewModel;
     private FragmentSettingBinding binding;
@@ -21,23 +22,13 @@ public class SettingFragment extends Fragment {
                              ViewGroup container, Bundle savedInstanceState) {
         settingViewModel =
                 new ViewModelProvider(this).get(SettingViewModel.class);
-
+        settingViewModel.getVersion().observe(getViewLifecycleOwner(), version -> binding.fwVersion.setRightText(version));
         binding = FragmentSettingBinding.inflate(inflater, container, false);
         binding.setSettingViewModel(settingViewModel);
-        settingViewModel.getVersion().observe(getViewLifecycleOwner(), version -> binding.fwVersion.setRightText(version));
+        getLifecycle().addObserver(settingViewModel);
         View root = binding.getRoot();
 
         return root;
-    }
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
     }
 
     @Override

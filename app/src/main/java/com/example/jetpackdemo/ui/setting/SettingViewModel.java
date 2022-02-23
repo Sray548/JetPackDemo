@@ -4,16 +4,18 @@ import android.app.Application;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.LifecycleObserver;
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.OnLifecycleEvent;
 
 import com.example.jetpackdemo.beans.DeviceInfo;
 import com.example.jetpackdemo.connect.DeviceConn;
-import com.example.jetpackdemo.connect.DeviceWebSocketClient;
 import com.google.gson.Gson;
 
 import java.nio.ByteBuffer;
 
-public class SettingViewModel extends AndroidViewModel {
+public class SettingViewModel extends AndroidViewModel implements LifecycleObserver {
 
     private final MutableLiveData<String> mVersion;
     private DeviceConn mDeviceConn;
@@ -27,7 +29,6 @@ public class SettingViewModel extends AndroidViewModel {
             @Override
             public int onDeviceConnect() {
                 mDeviceConn.getDeviceInfo();
-
                 return 0;
             }
 
@@ -45,6 +46,11 @@ public class SettingViewModel extends AndroidViewModel {
                 return 0;
             }
         });
+    }
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
+    private void onResume() {
+        mDeviceConn.getDeviceInfo();
     }
 
     public MutableLiveData<String> getVersion() {
