@@ -86,6 +86,7 @@
                     android:id="@+id/unit"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:onClick="@{()->click.setUnits()}"
                     app:LtextColor="@color/black"
                     app:LtextSize="@dimen/setting_item_left"
                     app:isShowRightText="true"

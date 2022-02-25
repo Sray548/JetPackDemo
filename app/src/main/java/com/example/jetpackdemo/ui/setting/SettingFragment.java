@@ -18,8 +18,6 @@ import com.example.jetpackdemo.databinding.SetDialogBinding;
 import com.example.jetpackdemo.ui.adapter.ItemListAdapter;
 import com.example.jetpackdemo.util.log.Logger;
 
-import java.util.Objects;
-
 public class SettingFragment extends Fragment {
     private Logger mLog = Logger.create("SettingFragment");
 
@@ -32,8 +30,10 @@ public class SettingFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         mSettingViewModel = new ViewModelProvider(this).get(SettingViewModel.class);
+
         mSettingViewModel.getVersion().observe(getViewLifecycleOwner(), version -> binding.fwVersion.setRightText(version));
         mSettingViewModel.getSysLang().observe(getViewLifecycleOwner(), lang -> binding.sysLang.setRightText(lang));
+        mSettingViewModel.getUnit().observe(getViewLifecycleOwner(), unit -> binding.unit.setRightText(unit));
 
         binding = FragmentSettingBinding.inflate(inflater, container, false);
         binding.setSettingViewModel(mSettingViewModel);
@@ -48,7 +48,7 @@ public class SettingFragment extends Fragment {
 
     private SetMode mSetMode;
 
-    private enum SetMode {
+    enum SetMode {
         SET_WARNING_ALERT_TYPE,
         SET_CRITICAL_ALERT_TYPE,
         SET_MAX_SPEED,
@@ -69,28 +69,35 @@ public class SettingFragment extends Fragment {
     }
 
     public class Click implements AdapterView.OnItemClickListener {
+
+        public void setUnits() {
+            mSetMode = SetMode.UNIT;
+            showDialog();
+        }
+
         public void setSysLang() {
             mSetMode = SetMode.SYS_LANG;
-            mSettingViewModel.initData();
             showDialog();
         }
 
         public void cancel() {
-            mSettingViewModel.resetSysLang();
+            mSettingViewModel.cancel(mSetMode);
             mSetDialog.dismiss();
         }
 
         public void ok() {
-            mSettingViewModel.setSysLang();
+            mSettingViewModel.ok(mSetMode);
+            mSetDialog.dismiss();
         }
 
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            mSettingViewModel.selectSysLang(position);
+            mSettingViewModel.select(position, mSetMode);
         }
     }
 
     private void showDialog() {
+        if (mSettingViewModel.getDeviceInfo() == null) return;
         if (mSetDialog == null) {
             SetDialogBinding bind = SetDialogBinding.inflate(LayoutInflater.from(getContext()));
             bind.setClick(mClick);
@@ -100,8 +107,7 @@ public class SettingFragment extends Fragment {
             bind.list.setAdapter(adapter);
             bind.list.setOnItemClickListener(mClick);
 
-            mSettingViewModel.getSysLang().observe(getViewLifecycleOwner(), lang ->
-                    adapter.select(Objects.requireNonNull(mSettingViewModel.getDatas().getValue()).indexOf(mSettingViewModel.getSysLang().getValue())));
+            mSettingViewModel.getPosition().observe(getViewLifecycleOwner(), adapter::select);
             mSettingViewModel.getRet().observe(getViewLifecycleOwner(), ret -> {
                 if (ret == 0 && mSetDialog != null) {
                     mSetDialog.dismiss();
@@ -116,5 +122,8 @@ public class SettingFragment extends Fragment {
         } else {
             mSetDialog.show();
         }
+
+        mSettingViewModel.initData(mSetMode);
+        mSettingViewModel.resetPosition(mSetMode);
     }
 }
