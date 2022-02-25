@@ -8,6 +8,10 @@
         <variable
             name="setting_view_model"
             type="com.example.jetpackdemo.ui.setting.SettingViewModel" />
+
+        <variable
+            name="click"
+            type="com.example.jetpackdemo.ui.setting.SettingFragment.Click" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -69,12 +73,13 @@
                     android:id="@+id/sys_lang"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:onClick="@{()->click.setSysLang()}"
                     app:LtextColor="@color/black"
                     app:LtextSize="@dimen/setting_item_left"
                     app:isShowRightText="true"
                     app:leftText="@string/sys_lang"
                     app:rightStyle="iconHide"
-                    app:rightText=""
+                    app:rightText="@{setting_view_model.sysLang}"
                     app:rightTextSize="@dimen/setting_item_right" />
 
                 <com.example.jetpackdemo.ui.widget.LSettingItem

@@ -22,7 +22,7 @@ import com.example.jetpackdemo.R;
  * 作者：Leon
  * 时间：2016/12/21 10:32
  */
-public class LSettingItem extends RelativeLayout implements View.OnClickListener {
+public class LSettingItem extends RelativeLayout {
     /*左侧显示文本*/
     private String mLeftText;
     /*左侧图标*/
@@ -254,7 +254,7 @@ public class LSettingItem extends RelativeLayout implements View.OnClickListener
                 mConfirmText.setVisibility(VISIBLE);
                 mConfirmText.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
                 mConfirmStatusImg.setImageResource(R.drawable.green_light);
-                mConfirmText.setOnClickListener(this);
+//                mConfirmText.setOnClickListener(this);
                 break;
             case CONFIRMED_NORMAL:
                 mRightLayout.setVisibility(View.INVISIBLE);
@@ -262,7 +262,7 @@ public class LSettingItem extends RelativeLayout implements View.OnClickListener
                 mConfirmReset.setVisibility(VISIBLE);
                 mConfirmReset.setChecked(true);
                 mConfirmStatusImg.setImageResource(R.drawable.green_light);
-                mConfirmText.setOnClickListener(this);
+//                mConfirmText.setOnClickListener(this);
                 break;
             case 10:
                 /*
@@ -293,7 +293,7 @@ public class LSettingItem extends RelativeLayout implements View.OnClickListener
                 mConfirmLL.setVisibility(VISIBLE);
                 mConfirmReset.setVisibility(VISIBLE);
                 mConfirmStatusImg.setImageResource(R.drawable.grey_light);
-                mConfirmText.setOnClickListener(this);
+//                mConfirmText.setOnClickListener(this);
                 break;
         }
     }
@@ -316,8 +316,8 @@ public class LSettingItem extends RelativeLayout implements View.OnClickListener
         mRightIcon_check = (AppCompatCheckBox) mView.findViewById(R.id.rightcheck);
         mRightIcon_switch = (SwitchCompat) mView.findViewById(R.id.rightswitch);
 
-        mFunc.setOnClickListener(this);
-        mConfirmReset.setOnClickListener(this);
+//        mFunc.setOnClickListener(this);
+//        mConfirmReset.setOnClickListener(this);
     }
 
     private FuncClickListener mListener;
@@ -328,21 +328,21 @@ public class LSettingItem extends RelativeLayout implements View.OnClickListener
         mClickId = id;
     }
 
-    @Override
-    public void onClick(View v) {
-        if (mListener == null) return;
-        switch (v.getId()) {
-            case R.id.func:
-                mListener.funcCLick(mClickId);
-                break;
-            case R.id.confirm_txt:
-                mListener.confirmSensor(mClickId);
-                break;
-            case R.id.reset_confirm:
-                mListener.resetSensor(mClickId);
-                break;
-        }
-    }
+//    @Override
+//    public void onClick(View v) {
+//        if (mListener == null) return;
+//        switch (v.getId()) {
+//            case R.id.func:
+//                mListener.funcCLick(mClickId);
+//                break;
+//            case R.id.confirm_txt:
+//                mListener.confirmSensor(mClickId);
+//                break;
+//            case R.id.reset_confirm:
+//                mListener.resetSensor(mClickId);
+//                break;
+//        }
+//    }
 
     public interface FuncClickListener {
         void funcCLick(int id);
