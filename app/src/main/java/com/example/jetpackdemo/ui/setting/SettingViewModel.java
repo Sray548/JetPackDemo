@@ -4,13 +4,17 @@ import static android.content.Context.MODE_PRIVATE;
 
 import static com.example.jetpackdemo.Constant.UNIT;
 import static com.example.jetpackdemo.Constant.UNIT_TYPE;
+import static com.example.jetpackdemo.ui.setting.SettingFragment.SetMode.SYS_LANG;
 import static com.example.jetpackdemo.util.UnitUtils.IMPERIAL;
 import static com.example.jetpackdemo.util.UnitUtils.METRIC;
 import static com.example.jetpackdemo.util.UnitUtils.US;
 
 import android.app.Application;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.text.TextUtils;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -40,10 +44,17 @@ public class SettingViewModel extends AndroidViewModel implements LifecycleObser
     private final MutableLiveData<String> mVersion;
     private final MutableLiveData<String> mSysLang;
     private final MutableLiveData<String> mUnit;
+    private final MutableLiveData<String> mWiFiSSid;
     private final MutableLiveData<Integer> mRet;
     private final MutableLiveData<Integer> mPosition;
+    private final MutableLiveData<Integer> mTitle;
     private final MutableLiveData<List<String>> mDatas;
+    private final MutableLiveData<SettingFragment.SetMode> mMode;
     private SharedPreferences mSp;
+
+    private String mPsd;
+
+    public static final String mInitPSD = "********";
 
     private ArrayList<String> datas = new ArrayList<>();
 
@@ -61,13 +72,19 @@ public class SettingViewModel extends AndroidViewModel implements LifecycleObser
         mDatas = new MutableLiveData<>();
         mRet = new MutableLiveData<>();
         mPosition = new MutableLiveData<>();
+        mTitle = new MutableLiveData<>();
+        mMode = new MutableLiveData<>();
+        mWiFiSSid = new MutableLiveData<>();
 
         mDatas.setValue(new ArrayList<>());
         mVersion.setValue("");
         mSysLang.setValue("");
-        mSysLang.setValue("");
+        mUnit.setValue("");
+        mWiFiSSid.setValue("");
         mRet.setValue(0);
         mPosition.setValue(0);
+        mPosition.setValue(0);
+        mMode.setValue(SYS_LANG);
 
         mDeviceConn = DeviceConn.getInstance(application);
         mDeviceConn.setListener(mListener);
@@ -94,13 +111,14 @@ public class SettingViewModel extends AndroidViewModel implements LifecycleObser
                 if (jso.optString("cmd").equals(DeviceConn.SETDEVICEINFO_COMMAND)) {
                     mDeviceConn.getDeviceInfo();
                     mRet.postValue(jso.optInt("ret"));
+                    Toast.makeText(mApplication, R.string.modify_success, Toast.LENGTH_SHORT).show();
                 } else {
                     Gson gson = new Gson();
                     mDeviceInfo = gson.fromJson(msg, DeviceInfo.class);
                     if (mDeviceInfo == null) return 0;
                     mVersion.postValue(mDeviceInfo.getDevinfo().getVersion());
-
                     resetSysLang();
+                    mWiFiSSid.postValue(mDeviceInfo.getWifi().getSsid());
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -109,8 +127,8 @@ public class SettingViewModel extends AndroidViewModel implements LifecycleObser
         }
     };
 
-    public void resetPosition(SettingFragment.SetMode setMode) {
-        switch (setMode) {
+    private void resetPosition() {
+        switch (Objects.requireNonNull(mMode.getValue())) {
             case SYS_LANG:
                 mPosition.setValue(Objects.requireNonNull(mDatas.getValue()).indexOf(mSysLang.getValue()));
                 break;
@@ -120,7 +138,7 @@ public class SettingViewModel extends AndroidViewModel implements LifecycleObser
         }
     }
 
-    public void resetSysLang() {
+    private void resetSysLang() {
         String language = mDeviceInfo.getLanguage();
         if (TextUtils.isEmpty(language) || Constant.EN_US.equals(language)) {
             mSysLang.postValue(mApplication.getResources().getString(R.string.en_us));
@@ -133,7 +151,7 @@ public class SettingViewModel extends AndroidViewModel implements LifecycleObser
         }
     }
 
-    public void resetUnit() {
+    private void resetUnit() {
         if (mSp == null) {
             mSp = mApplication.getSharedPreferences(UNIT_TYPE, MODE_PRIVATE);
         }
@@ -148,6 +166,10 @@ public class SettingViewModel extends AndroidViewModel implements LifecycleObser
                 mUnit.setValue(mApplication.getResources().getString(R.string.us));
                 break;
         }
+    }
+
+    private void resetWiFi() {
+        mWiFiSSid.setValue(mDeviceInfo.getWifi().getSsid());
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
@@ -167,6 +189,10 @@ public class SettingViewModel extends AndroidViewModel implements LifecycleObser
         return mUnit;
     }
 
+    public MutableLiveData<String> getWiFi() {
+        return mWiFiSSid;
+    }
+
     public MutableLiveData<String> getSysLang() {
         return mSysLang;
     }
@@ -179,9 +205,13 @@ public class SettingViewModel extends AndroidViewModel implements LifecycleObser
         return mPosition;
     }
 
-    public void initData(SettingFragment.SetMode setMode) {
+    public MutableLiveData<Integer> getTitle() {
+        return mTitle;
+    }
+
+    public void initData() {
         datas.clear();
-        switch (setMode) {
+        switch (Objects.requireNonNull(mMode.getValue())) {
             case SYS_LANG:
                 datas.add(mApplication.getResources().getString(R.string.en_us));
                 datas.add(mApplication.getResources().getString(R.string.zh_cn));
@@ -197,12 +227,26 @@ public class SettingViewModel extends AndroidViewModel implements LifecycleObser
         mDatas.setValue(datas);
     }
 
+    public void initTitle() {
+        switch (Objects.requireNonNull(mMode.getValue())) {
+            case SYS_LANG:
+                mTitle.setValue(R.string.sys_lang);
+                break;
+            case UNIT:
+                mTitle.setValue(R.string.unit);
+                break;
+            case WIFI:
+                mTitle.setValue(R.string.wifi_info);
+                break;
+        }
+    }
+
     public MutableLiveData<List<String>> getDatas() {
         return mDatas;
     }
 
-    public void select(int position, SettingFragment.SetMode setMode) {
-        switch (setMode) {
+    public void select(int position) {
+        switch (Objects.requireNonNull(mMode.getValue())) {
             case SYS_LANG:
                 mSysLang.setValue(Objects.requireNonNull(mDatas.getValue()).get(position));
                 mPosition.setValue(Objects.requireNonNull(mDatas.getValue()).indexOf(mSysLang.getValue()));
@@ -214,8 +258,8 @@ public class SettingViewModel extends AndroidViewModel implements LifecycleObser
         }
     }
 
-    public void ok(SettingFragment.SetMode setMode) {
-        switch (setMode) {
+    public void ok() {
+        switch (Objects.requireNonNull(mMode.getValue())) {
             case SYS_LANG:
                 String lang = "";
                 switch (Objects.requireNonNull(mDatas.getValue()).indexOf(mSysLang.getValue())) {
@@ -239,17 +283,68 @@ public class SettingViewModel extends AndroidViewModel implements LifecycleObser
                 edit.putInt(UNIT, Objects.requireNonNull(mDatas.getValue()).indexOf(mUnit.getValue()));
                 edit.apply();
                 break;
+            case WIFI:
+                mDeviceConn.setWiFiInfo(mWiFiSSid.getValue(), mPsd);
+                break;
         }
     }
 
-    public void cancel(SettingFragment.SetMode setMode) {
-        switch (setMode) {
+    public void cancel() {
+        switch (Objects.requireNonNull(mMode.getValue())) {
             case SYS_LANG:
                 resetSysLang();
                 break;
             case UNIT:
                 resetUnit();
                 break;
+            case WIFI:
+                resetWiFi();
+                break;
+        }
+    }
+
+    public void mode(SettingFragment.SetMode mode) {
+        mMode.setValue(mode);
+        initTitle();
+        initData();
+        resetPosition();
+    }
+
+    public MutableLiveData<SettingFragment.SetMode> getMode() {
+        return mMode;
+    }
+
+    public void setWiFiInfo(String ssid, String psd) {
+        if (TextUtils.isEmpty(ssid)) {
+            Toast.makeText(mApplication, R.string.wifi_name_empty, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (ssid.length() > 16) {
+            Toast.makeText(mApplication, R.string.wifi_name_too_long, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (TextUtils.isEmpty(psd)) {
+            Toast.makeText(mApplication, R.string.psd_too_short, Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (psd.length() < 8) {
+            Toast.makeText(mApplication, R.string.psd_too_short, Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (psd.length() > 16) {
+            Toast.makeText(mApplication, R.string.psd_too_long, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        InputMethodManager manager = (InputMethodManager) mApplication.getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (manager != null) {
+            if (psd.equals(mInitPSD)) {
+                psd = "";
+            }
+            mWiFiSSid.setValue(ssid);
+            this.mPsd = psd;
         }
     }
 }

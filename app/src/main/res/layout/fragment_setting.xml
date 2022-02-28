@@ -66,7 +66,6 @@
                     app:isShowRightText="true"
                     app:leftText="@string/device_version"
                     app:rightStyle="iconHide"
-                    app:rightText="@{setting_view_model.version}"
                     app:rightTextSize="@dimen/setting_item_right" />
 
                 <com.example.jetpackdemo.ui.widget.LSettingItem
@@ -78,8 +77,6 @@
                     app:LtextSize="@dimen/setting_item_left"
                     app:isShowRightText="true"
                     app:leftText="@string/sys_lang"
-                    app:rightStyle="iconHide"
-                    app:rightText="@{setting_view_model.sysLang}"
                     app:rightTextSize="@dimen/setting_item_right" />
 
                 <com.example.jetpackdemo.ui.widget.LSettingItem
@@ -91,18 +88,17 @@
                     app:LtextSize="@dimen/setting_item_left"
                     app:isShowRightText="true"
                     app:leftText="@string/unit"
-                    app:rightText=""
                     app:rightTextSize="@dimen/setting_item_right" />
 
                 <com.example.jetpackdemo.ui.widget.LSettingItem
                     android:id="@+id/wifi"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:onClick="@{()->click.setWiFi()}"
                     app:LtextColor="@color/black"
                     app:LtextSize="@dimen/setting_item_left"
                     app:isShowRightText="true"
                     app:leftText="@string/wifi_name"
-                    app:rightText=""
                     app:rightTextSize="@dimen/setting_item_right" />
 
             </LinearLayout>

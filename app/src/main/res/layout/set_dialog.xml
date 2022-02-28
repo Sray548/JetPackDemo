@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <data>
 
@@ -34,7 +35,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="20dp"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:visibility="gone">
 
             <TextView
                 android:layout_width="match_parent"
@@ -53,6 +55,41 @@
 
         </LinearLayout>
 
+        <LinearLayout
+            android:id="@+id/wifi_ll"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginBottom="20dp"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <EditText
+                android:id="@+id/ssid_edit"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:background="@drawable/input_bg"
+                android:gravity="center_vertical"
+                android:hint="@string/wifi_name"
+                android:paddingLeft="10dp"
+                android:textColor="@color/black"
+                android:textSize="@dimen/text_small" />
+
+            <EditText
+                android:id="@+id/password_edit"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/input_bg"
+                android:gravity="center_vertical"
+                android:hint="@string/wifi_psd"
+                android:paddingLeft="10dp"
+                android:textColor="@color/black"
+                android:textSize="@dimen/text_small" />
+
+        </LinearLayout>
+
         <TextView
             android:layout_width="match_parent"
             android:layout_height="1px"
@@ -62,7 +99,8 @@
             android:id="@+id/func_ll"
             android:layout_width="match_parent"
             android:layout_height="40dp"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:visibility="gone">
 
             <TextView
                 android:id="@+id/cancel"
