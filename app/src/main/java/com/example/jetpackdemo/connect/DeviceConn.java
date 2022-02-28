@@ -356,7 +356,8 @@ public class DeviceConn {
             } catch (JSONException e) {
                 Log.e("json exception:" + e);
             }
-            sendMsg(jsonObject.toString());
+//            sendMsg(jsonObject.toString());
+            Log.d("send cmd: " + jsonObject);
         }
     }
 

@@ -6,15 +6,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.example.jetpackdemo.R;
 import com.example.jetpackdemo.databinding.FragmentSettingBinding;
 import com.example.jetpackdemo.databinding.SetDialogBinding;
 import com.example.jetpackdemo.ui.adapter.ItemListAdapter;
+import com.example.jetpackdemo.util.Utils;
 import com.example.jetpackdemo.util.log.Logger;
 
 import java.util.Objects;
@@ -39,6 +40,17 @@ public class SettingFragment extends Fragment {
         mSettingViewModel.getWiFi().observe(getViewLifecycleOwner(), wifi -> binding.wifi.setRightText(wifi));
         mSettingViewModel.getWiFiMode().observe(getViewLifecycleOwner(), wifi_mode -> binding.wifiMode.setRightText(wifi_mode));
         mSettingViewModel.supportWiFiMode().observe(getViewLifecycleOwner(), support -> binding.wifiMode.setVisibility(support ? View.VISIBLE : View.GONE));
+        mSettingViewModel.getSdTotal().observe(getViewLifecycleOwner(), total -> {
+            if (total == 0) {
+                binding.formatSdCard.setClickable(false);
+                binding.formatSdCard.switchRightStyle(1);
+                binding.formatSdCard.setRightText(getResources().getString(R.string.no_sdcard));
+            } else {
+                binding.formatSdCard.setClickable(true);
+                binding.formatSdCard.switchRightStyle(0);
+                binding.formatSdCard.setRightText(String.format(getResources().getString(R.string.sd_space), Utils.formatSize(total)));
+            }
+        });
 
         binding = FragmentSettingBinding.inflate(inflater, container, false);
         binding.setSettingViewModel(mSettingViewModel);
@@ -83,6 +95,11 @@ public class SettingFragment extends Fragment {
 
         public void setWiFiMode() {
             mSettingViewModel.mode(SetMode.WIFI_MODE);
+            showDialog();
+        }
+
+        public void formatSdCard() {
+            mSettingViewModel.mode(SetMode.FORMAT_SD);
             showDialog();
         }
 
@@ -157,6 +174,11 @@ public class SettingFragment extends Fragment {
                     case WIFI_MODE:
                         mSetBind.title.setVisibility(View.VISIBLE);
                         mSetBind.listLl.setVisibility(View.VISIBLE);
+                        mSetBind.funcLl.setVisibility(View.VISIBLE);
+                        mSetBind.setMsg.setVisibility(View.VISIBLE);
+                        break;
+                    case FORMAT_SD:
+                        mSetBind.title.setVisibility(View.VISIBLE);
                         mSetBind.funcLl.setVisibility(View.VISIBLE);
                         mSetBind.setMsg.setVisibility(View.VISIBLE);
                         break;

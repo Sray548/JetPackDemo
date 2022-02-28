@@ -34,6 +34,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.nio.ByteBuffer;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -47,6 +48,7 @@ public class SettingViewModel extends AndroidViewModel implements LifecycleObser
     private final MutableLiveData<String> mWiFiSSid;
     private final MutableLiveData<String> mWiFiMode;
     private final MutableLiveData<Boolean> mSupportWiFiMode;
+    private final MutableLiveData<Double> mSdtotal;
     private final MutableLiveData<Integer> mRet;
     private final MutableLiveData<Integer> mPosition;
     private final MutableLiveData<Integer> mTitle;
@@ -81,6 +83,7 @@ public class SettingViewModel extends AndroidViewModel implements LifecycleObser
         mWiFiSSid = new MutableLiveData<>();
         mWiFiMode = new MutableLiveData<>();
         mSupportWiFiMode = new MutableLiveData<>();
+        mSdtotal = new MutableLiveData<>();
 
         mDatas.setValue(new ArrayList<>());
         mVersion.setValue("");
@@ -88,6 +91,7 @@ public class SettingViewModel extends AndroidViewModel implements LifecycleObser
         mUnit.setValue("");
         mWiFiSSid.setValue("");
         mWiFiMode.setValue("");
+        mSdtotal.setValue(0.0);
         mRet.setValue(0);
         mPosition.setValue(0);
         mPosition.setValue(0);
@@ -131,6 +135,7 @@ public class SettingViewModel extends AndroidViewModel implements LifecycleObser
                     mWiFiSSid.postValue(mDeviceInfo.getWifi().getSsid());
                     mWiFiMode.postValue(mDeviceInfo.getWifi().is_$5GMode() ? "5G" : "2.4G");
                     mSupportWiFiMode.postValue(!mDeviceInfo.getDevinfo().getManu().equals("Japan5G"));
+                    mSdtotal.postValue((double) mDeviceInfo.getSdtotal());
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -236,6 +241,10 @@ public class SettingViewModel extends AndroidViewModel implements LifecycleObser
         return mSupportWiFiMode;
     }
 
+    public MutableLiveData<Double> getSdTotal() {
+        return mSdtotal;
+    }
+
     public MutableLiveData<Integer> getMsg() {
         return mMsg;
     }
@@ -276,6 +285,10 @@ public class SettingViewModel extends AndroidViewModel implements LifecycleObser
             case WIFI_MODE:
                 mTitle.setValue(R.string.wifi_mode);
                 mMsg.setValue(R.string.wifi_mode_tip);
+                break;
+            case FORMAT_SD:
+                mTitle.setValue(R.string.format_sd_card);
+                mMsg.setValue(R.string.format_sd_confirm);
                 break;
         }
     }
@@ -328,6 +341,9 @@ public class SettingViewModel extends AndroidViewModel implements LifecycleObser
                 break;
             case WIFI_MODE:
                 mDeviceConn.setWiFiMode(Objects.requireNonNull(mPosition.getValue()));
+                break;
+            case FORMAT_SD:
+                mDeviceConn.format_sd();
                 break;
         }
     }
