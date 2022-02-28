@@ -38,6 +38,7 @@ public class SettingFragment extends Fragment {
         mSettingViewModel.getUnit().observe(getViewLifecycleOwner(), unit -> binding.unit.setRightText(unit));
         mSettingViewModel.getWiFi().observe(getViewLifecycleOwner(), wifi -> binding.wifi.setRightText(wifi));
         mSettingViewModel.getWiFiMode().observe(getViewLifecycleOwner(), wifi_mode -> binding.wifiMode.setRightText(wifi_mode));
+        mSettingViewModel.supportWiFiMode().observe(getViewLifecycleOwner(), support -> binding.wifiMode.setVisibility(support ? View.VISIBLE : View.GONE));
 
         binding = FragmentSettingBinding.inflate(inflater, container, false);
         binding.setSettingViewModel(mSettingViewModel);
@@ -45,9 +46,7 @@ public class SettingFragment extends Fragment {
         binding.setClick(mClick);
         getLifecycle().addObserver(mSettingViewModel);
 
-        View root = binding.getRoot();
-
-        return root;
+        return binding.getRoot();
     }
 
     enum SetMode {

@@ -46,6 +46,7 @@ public class SettingViewModel extends AndroidViewModel implements LifecycleObser
     private final MutableLiveData<String> mUnit;
     private final MutableLiveData<String> mWiFiSSid;
     private final MutableLiveData<String> mWiFiMode;
+    private final MutableLiveData<Boolean> mSupportWiFiMode;
     private final MutableLiveData<Integer> mRet;
     private final MutableLiveData<Integer> mPosition;
     private final MutableLiveData<Integer> mTitle;
@@ -79,6 +80,7 @@ public class SettingViewModel extends AndroidViewModel implements LifecycleObser
         mMode = new MutableLiveData<>();
         mWiFiSSid = new MutableLiveData<>();
         mWiFiMode = new MutableLiveData<>();
+        mSupportWiFiMode = new MutableLiveData<>();
 
         mDatas.setValue(new ArrayList<>());
         mVersion.setValue("");
@@ -92,6 +94,7 @@ public class SettingViewModel extends AndroidViewModel implements LifecycleObser
         mMode.setValue(SYS_LANG);
         mMsg.setValue(0);
         mTitle.setValue(0);
+        mSupportWiFiMode.setValue(false);
 
         mDeviceConn = DeviceConn.getInstance(application);
         mDeviceConn.setListener(mListener);
@@ -127,6 +130,7 @@ public class SettingViewModel extends AndroidViewModel implements LifecycleObser
                     resetSysLang();
                     mWiFiSSid.postValue(mDeviceInfo.getWifi().getSsid());
                     mWiFiMode.postValue(mDeviceInfo.getWifi().is_$5GMode() ? "5G" : "2.4G");
+                    mSupportWiFiMode.postValue(!mDeviceInfo.getDevinfo().getManu().equals("Japan5G"));
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -226,6 +230,10 @@ public class SettingViewModel extends AndroidViewModel implements LifecycleObser
 
     public MutableLiveData<Integer> getTitle() {
         return mTitle;
+    }
+
+    public MutableLiveData<Boolean> supportWiFiMode() {
+        return mSupportWiFiMode;
     }
 
     public MutableLiveData<Integer> getMsg() {
