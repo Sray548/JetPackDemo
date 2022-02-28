@@ -14,7 +14,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.text.TextUtils;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -34,7 +33,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.nio.ByteBuffer;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -49,7 +47,8 @@ public class SettingViewModel extends AndroidViewModel implements LifecycleObser
     private final MutableLiveData<String> mWiFiMode;
     private final MutableLiveData<Boolean> mSupportWiFiMode;
     private final MutableLiveData<Double> mSdtotal;
-    private final MutableLiveData<Integer> mRet;
+    private final MutableLiveData<Integer> mSetDeviceInfoRet;
+    private final MutableLiveData<Integer> mResetRet;
     private final MutableLiveData<Integer> mPosition;
     private final MutableLiveData<Integer> mTitle;
     private final MutableLiveData<Integer> mMsg;
@@ -75,7 +74,8 @@ public class SettingViewModel extends AndroidViewModel implements LifecycleObser
         mSysLang = new MutableLiveData<>();
         mUnit = new MutableLiveData<>();
         mDatas = new MutableLiveData<>();
-        mRet = new MutableLiveData<>();
+        mSetDeviceInfoRet = new MutableLiveData<>();
+        mResetRet = new MutableLiveData<>();
         mPosition = new MutableLiveData<>();
         mTitle = new MutableLiveData<>();
         mMsg = new MutableLiveData<>();
@@ -92,7 +92,8 @@ public class SettingViewModel extends AndroidViewModel implements LifecycleObser
         mWiFiSSid.setValue("");
         mWiFiMode.setValue("");
         mSdtotal.setValue(0.0);
-        mRet.setValue(0);
+        mSetDeviceInfoRet.setValue(0);
+        mResetRet.setValue(0);
         mPosition.setValue(0);
         mPosition.setValue(0);
         mMode.setValue(SYS_LANG);
@@ -109,7 +110,7 @@ public class SettingViewModel extends AndroidViewModel implements LifecycleObser
     private DeviceConn.DeviceConnListener mListener = new DeviceConn.DeviceConnListener() {
         @Override
         public int onDeviceConnect() {
-            mDeviceConn.getDeviceInfo();
+            refreshInfo();
             return 0;
         }
 
@@ -122,10 +123,28 @@ public class SettingViewModel extends AndroidViewModel implements LifecycleObser
         public int onDeviceMessage(String msg, ByteBuffer data) {
             try {
                 JSONObject jso = new JSONObject(msg);
+                String type = jso.optString("type");
+                int ret = jso.optInt("ret");
                 if (jso.optString("cmd").equals(DeviceConn.SETDEVICEINFO_COMMAND)) {
-                    mDeviceConn.getDeviceInfo();
-                    mRet.postValue(jso.optInt("ret"));
-                    Toast.makeText(mApplication, R.string.modify_success, Toast.LENGTH_SHORT).show();
+                    refreshInfo();
+                    mSetDeviceInfoRet.postValue(jso.optInt("ret"));
+                } else if (jso.optString("cmd").equals(DeviceConn.CONTROL_COMMAND)) {
+                    if (type.equals(DeviceConn.CONTROL_RESET_TYPE)) {
+                        mResetRet.postValue(ret);
+                        refreshInfo();
+                    }
+                    if (type.equals(DeviceConn.CONTROL_CONFIRM_SNR)) {
+                        if (ret == 0) {
+//                            mDeviceConn.startSnrStat();
+                            mDeviceConn.getTireBeltInfo();
+                        }
+                    }
+
+                    if (type.equals(DeviceConn.CONTROL_DISABLE_SNR)) {
+                        if (ret == 0) {
+                            mDeviceConn.getTireBeltInfo();
+                        }
+                    }
                 } else {
                     Gson gson = new Gson();
                     mDeviceInfo = gson.fromJson(msg, DeviceInfo.class);
@@ -143,6 +162,13 @@ public class SettingViewModel extends AndroidViewModel implements LifecycleObser
             return 0;
         }
     };
+
+    private void refreshInfo() {
+//        mDeviceConn.getTireBeltInfo();
+        mDeviceConn.getDeviceInfo();
+//        mDeviceConn.getDmodInfo();
+//        mDeviceConn.startSnrStat();
+    }
 
     private void resetPosition() {
         switch (Objects.requireNonNull(mMode.getValue())) {
@@ -225,8 +251,12 @@ public class SettingViewModel extends AndroidViewModel implements LifecycleObser
         return mSysLang;
     }
 
-    public MutableLiveData<Integer> getRet() {
-        return mRet;
+    public MutableLiveData<Integer> getSetDeviceInfoRet() {
+        return mSetDeviceInfoRet;
+    }
+
+    public MutableLiveData<Integer> getResetRet() {
+        return mResetRet;
     }
 
     public MutableLiveData<Integer> getPosition() {
@@ -290,6 +320,10 @@ public class SettingViewModel extends AndroidViewModel implements LifecycleObser
                 mTitle.setValue(R.string.format_sd_card);
                 mMsg.setValue(R.string.format_sd_confirm);
                 break;
+            case RESET:
+                mTitle.setValue(R.string.reset);
+                mMsg.setValue(R.string.reset_confirm);
+                break;
         }
     }
 
@@ -345,6 +379,9 @@ public class SettingViewModel extends AndroidViewModel implements LifecycleObser
             case FORMAT_SD:
                 mDeviceConn.format_sd();
                 break;
+            case RESET:
+                mDeviceConn.reset();
+                break;
         }
     }
 
@@ -377,28 +414,6 @@ public class SettingViewModel extends AndroidViewModel implements LifecycleObser
     }
 
     public void setWiFiInfo(String ssid, String psd) {
-        if (TextUtils.isEmpty(ssid)) {
-            Toast.makeText(mApplication, R.string.wifi_name_empty, Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        if (ssid.length() > 16) {
-            Toast.makeText(mApplication, R.string.wifi_name_too_long, Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        if (TextUtils.isEmpty(psd)) {
-            Toast.makeText(mApplication, R.string.psd_too_short, Toast.LENGTH_SHORT).show();
-            return;
-        }
-        if (psd.length() < 8) {
-            Toast.makeText(mApplication, R.string.psd_too_short, Toast.LENGTH_SHORT).show();
-            return;
-        }
-        if (psd.length() > 16) {
-            Toast.makeText(mApplication, R.string.psd_too_long, Toast.LENGTH_SHORT).show();
-            return;
-        }
 
         InputMethodManager manager = (InputMethodManager) mApplication.getSystemService(Context.INPUT_METHOD_SERVICE);
         if (manager != null) {

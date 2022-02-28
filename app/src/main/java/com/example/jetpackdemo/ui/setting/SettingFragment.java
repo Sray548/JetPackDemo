@@ -2,10 +2,12 @@ package com.example.jetpackdemo.ui.setting;
 
 import android.app.AlertDialog;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -13,6 +15,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.jetpackdemo.R;
 import com.example.jetpackdemo.databinding.FragmentSettingBinding;
+import com.example.jetpackdemo.databinding.ResetingViewBinding;
 import com.example.jetpackdemo.databinding.SetDialogBinding;
 import com.example.jetpackdemo.ui.adapter.ItemListAdapter;
 import com.example.jetpackdemo.util.Utils;
@@ -24,41 +27,42 @@ public class SettingFragment extends Fragment {
     private Logger mLog = Logger.create("SettingFragment");
 
     private SettingViewModel mSettingViewModel;
-    private FragmentSettingBinding binding;
+    private FragmentSettingBinding mBinding;
     private SetDialogBinding mSetBind;
 
     private AlertDialog mSetDialog;
+    private AlertDialog mResettingDialog;
     private Click mClick;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         mSettingViewModel = new ViewModelProvider(this).get(SettingViewModel.class);
 
-        mSettingViewModel.getVersion().observe(getViewLifecycleOwner(), version -> binding.fwVersion.setRightText(version));
-        mSettingViewModel.getSysLang().observe(getViewLifecycleOwner(), lang -> binding.sysLang.setRightText(lang));
-        mSettingViewModel.getUnit().observe(getViewLifecycleOwner(), unit -> binding.unit.setRightText(unit));
-        mSettingViewModel.getWiFi().observe(getViewLifecycleOwner(), wifi -> binding.wifi.setRightText(wifi));
-        mSettingViewModel.getWiFiMode().observe(getViewLifecycleOwner(), wifi_mode -> binding.wifiMode.setRightText(wifi_mode));
-        mSettingViewModel.supportWiFiMode().observe(getViewLifecycleOwner(), support -> binding.wifiMode.setVisibility(support ? View.VISIBLE : View.GONE));
+        mSettingViewModel.getVersion().observe(getViewLifecycleOwner(), version -> mBinding.fwVersion.setRightText(version));
+        mSettingViewModel.getSysLang().observe(getViewLifecycleOwner(), lang -> mBinding.sysLang.setRightText(lang));
+        mSettingViewModel.getUnit().observe(getViewLifecycleOwner(), unit -> mBinding.unit.setRightText(unit));
+        mSettingViewModel.getWiFi().observe(getViewLifecycleOwner(), wifi -> mBinding.wifi.setRightText(wifi));
+        mSettingViewModel.getWiFiMode().observe(getViewLifecycleOwner(), wifi_mode -> mBinding.wifiMode.setRightText(wifi_mode));
+        mSettingViewModel.supportWiFiMode().observe(getViewLifecycleOwner(), support -> mBinding.wifiMode.setVisibility(support ? View.VISIBLE : View.GONE));
         mSettingViewModel.getSdTotal().observe(getViewLifecycleOwner(), total -> {
             if (total == 0) {
-                binding.formatSdCard.setClickable(false);
-                binding.formatSdCard.switchRightStyle(1);
-                binding.formatSdCard.setRightText(getResources().getString(R.string.no_sdcard));
+                mBinding.formatSdCard.setClickable(false);
+                mBinding.formatSdCard.switchRightStyle(1);
+                mBinding.formatSdCard.setRightText(getResources().getString(R.string.no_sdcard));
             } else {
-                binding.formatSdCard.setClickable(true);
-                binding.formatSdCard.switchRightStyle(0);
-                binding.formatSdCard.setRightText(String.format(getResources().getString(R.string.sd_space), Utils.formatSize(total)));
+                mBinding.formatSdCard.setClickable(true);
+                mBinding.formatSdCard.switchRightStyle(0);
+                mBinding.formatSdCard.setRightText(String.format(getResources().getString(R.string.sd_space), Utils.formatSize(total)));
             }
         });
 
-        binding = FragmentSettingBinding.inflate(inflater, container, false);
-        binding.setSettingViewModel(mSettingViewModel);
+        mBinding = FragmentSettingBinding.inflate(inflater, container, false);
+        mBinding.setSettingViewModel(mSettingViewModel);
         mClick = new Click();
-        binding.setClick(mClick);
+        mBinding.setClick(mClick);
         getLifecycle().addObserver(mSettingViewModel);
 
-        return binding.getRoot();
+        return mBinding.getRoot();
     }
 
     enum SetMode {
@@ -78,7 +82,7 @@ public class SettingFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        binding = null;
+        mBinding = null;
     }
 
     public class Click implements AdapterView.OnItemClickListener {
@@ -103,6 +107,11 @@ public class SettingFragment extends Fragment {
             showDialog();
         }
 
+        public void reset() {
+            mSettingViewModel.mode(SetMode.RESET);
+            showDialog();
+        }
+
         public void setSysLang() {
             mSettingViewModel.mode(SetMode.SYS_LANG);
             showDialog();
@@ -116,7 +125,41 @@ public class SettingFragment extends Fragment {
         public void ok() {
             switch (Objects.requireNonNull(mSettingViewModel.getMode().getValue())) {
                 case WIFI:
-                    mSettingViewModel.setWiFiInfo(mSetBind.ssidEdit.getText().toString(), mSetBind.passwordEdit.getText().toString());
+                    String ssid = mSetBind.ssidEdit.getText().toString();
+                    String psd = mSetBind.passwordEdit.getText().toString();
+                    if (TextUtils.isEmpty(ssid)) {
+                        Toast.makeText(getContext(), R.string.wifi_name_empty, Toast.LENGTH_SHORT).show();
+                        break;
+                    }
+
+                    if (ssid.length() > 16) {
+                        Toast.makeText(getContext(), R.string.wifi_name_too_long, Toast.LENGTH_SHORT).show();
+                        break;
+                    }
+
+                    if (TextUtils.isEmpty(psd)) {
+                        Toast.makeText(getContext(), R.string.psd_too_short, Toast.LENGTH_SHORT).show();
+                        break;
+                    }
+                    if (psd.length() < 8) {
+                        Toast.makeText(getContext(), R.string.psd_too_short, Toast.LENGTH_SHORT).show();
+                        break;
+                    }
+                    if (psd.length() > 16) {
+                        Toast.makeText(getContext(), R.string.psd_too_long, Toast.LENGTH_SHORT).show();
+                        break;
+                    }
+                    mSettingViewModel.setWiFiInfo(ssid, psd);
+                    break;
+                case RESET:
+                    if (mResettingDialog == null) {
+                        ResetingViewBinding bind = ResetingViewBinding.inflate(LayoutInflater.from(getContext()));
+                        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                        builder.setView(bind.getRoot());
+                        mResettingDialog = builder.create();
+                        mResettingDialog.setCanceledOnTouchOutside(false);
+                    }
+                    mResettingDialog.show();
                     break;
             }
             mSettingViewModel.ok();
@@ -147,9 +190,17 @@ public class SettingFragment extends Fragment {
             mSettingViewModel.getPosition().observe(getViewLifecycleOwner(), adapter::select);
             mSettingViewModel.getTitle().observe(getViewLifecycleOwner(), mSetBind.title::setText);
             mSettingViewModel.getMsg().observe(getViewLifecycleOwner(), mSetBind.setMsg::setText);
-            mSettingViewModel.getRet().observe(getViewLifecycleOwner(), ret -> {
+            mSettingViewModel.getSetDeviceInfoRet().observe(getViewLifecycleOwner(), ret -> {
                 if (ret == 0 && mSetDialog != null) {
+                    Toast.makeText(getContext(), R.string.modify_success, Toast.LENGTH_SHORT).show();
                     mSetDialog.dismiss();
+                }
+            });
+
+            mSettingViewModel.getResetRet().observe(getViewLifecycleOwner(), ret -> {
+                if (ret == 0 && mResettingDialog != null) {
+                    Toast.makeText(getContext(), R.string.reset_success, Toast.LENGTH_SHORT).show();
+                    mResettingDialog.dismiss();
                 }
             });
 
@@ -178,6 +229,7 @@ public class SettingFragment extends Fragment {
                         mSetBind.setMsg.setVisibility(View.VISIBLE);
                         break;
                     case FORMAT_SD:
+                    case RESET:
                         mSetBind.title.setVisibility(View.VISIBLE);
                         mSetBind.funcLl.setVisibility(View.VISIBLE);
                         mSetBind.setMsg.setVisibility(View.VISIBLE);

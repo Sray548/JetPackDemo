@@ -126,6 +126,19 @@
                     app:LtextSize="@dimen/setting_item_left"
                     app:isShowRightText="true"
                     app:leftText="@string/format_sd_card"
+                    app:rightTextSize="@dimen/setting_item_right">
+
+                </com.example.jetpackdemo.ui.widget.LSettingItem>
+
+                <com.example.jetpackdemo.ui.widget.LSettingItem
+                    android:id="@+id/reset"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:onClick="@{()->click.reset()}"
+                    app:LtextColor="@color/black"
+                    app:LtextSize="@dimen/setting_item_left"
+                    app:leftText="@string/reset"
+                    app:rightStyle="iconHide"
                     app:rightTextSize="@dimen/setting_item_right" />
 
             </LinearLayout>
