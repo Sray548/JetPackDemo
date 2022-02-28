@@ -99,6 +99,19 @@
                     app:LtextSize="@dimen/setting_item_left"
                     app:isShowRightText="true"
                     app:leftText="@string/wifi_name"
+                    app:rightTextSize="@dimen/setting_item_right">
+
+                </com.example.jetpackdemo.ui.widget.LSettingItem>
+
+                <com.example.jetpackdemo.ui.widget.LSettingItem
+                    android:id="@+id/wifi_mode"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:onClick="@{()->click.setWiFiMode()}"
+                    app:LtextColor="@color/black"
+                    app:LtextSize="@dimen/setting_item_left"
+                    app:isShowRightText="true"
+                    app:leftText="@string/wifi_mode"
                     app:rightTextSize="@dimen/setting_item_right" />
 
             </LinearLayout>

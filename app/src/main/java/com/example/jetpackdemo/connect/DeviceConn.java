@@ -1504,7 +1504,8 @@ public class DeviceConn {
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                    sendMsg(jsonObject.toString());
+//                    sendMsg(jsonObject.toString());
+                    Log.d("send cmd: " + jsonObject);
                 } else {
                     Log.e("setWiFiMode failed, WS disconnect");
                 }

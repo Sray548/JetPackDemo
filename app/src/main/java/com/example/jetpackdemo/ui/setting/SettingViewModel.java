@@ -45,9 +45,11 @@ public class SettingViewModel extends AndroidViewModel implements LifecycleObser
     private final MutableLiveData<String> mSysLang;
     private final MutableLiveData<String> mUnit;
     private final MutableLiveData<String> mWiFiSSid;
+    private final MutableLiveData<String> mWiFiMode;
     private final MutableLiveData<Integer> mRet;
     private final MutableLiveData<Integer> mPosition;
     private final MutableLiveData<Integer> mTitle;
+    private final MutableLiveData<Integer> mMsg;
     private final MutableLiveData<List<String>> mDatas;
     private final MutableLiveData<SettingFragment.SetMode> mMode;
     private SharedPreferences mSp;
@@ -73,18 +75,23 @@ public class SettingViewModel extends AndroidViewModel implements LifecycleObser
         mRet = new MutableLiveData<>();
         mPosition = new MutableLiveData<>();
         mTitle = new MutableLiveData<>();
+        mMsg = new MutableLiveData<>();
         mMode = new MutableLiveData<>();
         mWiFiSSid = new MutableLiveData<>();
+        mWiFiMode = new MutableLiveData<>();
 
         mDatas.setValue(new ArrayList<>());
         mVersion.setValue("");
         mSysLang.setValue("");
         mUnit.setValue("");
         mWiFiSSid.setValue("");
+        mWiFiMode.setValue("");
         mRet.setValue(0);
         mPosition.setValue(0);
         mPosition.setValue(0);
         mMode.setValue(SYS_LANG);
+        mMsg.setValue(0);
+        mTitle.setValue(0);
 
         mDeviceConn = DeviceConn.getInstance(application);
         mDeviceConn.setListener(mListener);
@@ -119,6 +126,7 @@ public class SettingViewModel extends AndroidViewModel implements LifecycleObser
                     mVersion.postValue(mDeviceInfo.getDevinfo().getVersion());
                     resetSysLang();
                     mWiFiSSid.postValue(mDeviceInfo.getWifi().getSsid());
+                    mWiFiMode.postValue(mDeviceInfo.getWifi().is_$5GMode() ? "5G" : "2.4G");
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -134,6 +142,9 @@ public class SettingViewModel extends AndroidViewModel implements LifecycleObser
                 break;
             case UNIT:
                 mPosition.setValue(Objects.requireNonNull(mDatas.getValue()).indexOf(mUnit.getValue()));
+                break;
+            case WIFI_MODE:
+                mPosition.setValue(Objects.requireNonNull(mDatas.getValue()).indexOf(mWiFiMode.getValue()));
                 break;
         }
     }
@@ -172,6 +183,10 @@ public class SettingViewModel extends AndroidViewModel implements LifecycleObser
         mWiFiSSid.setValue(mDeviceInfo.getWifi().getSsid());
     }
 
+    private void resetWiFiMode() {
+        mWiFiMode.setValue(mDeviceInfo.getWifi().is_$5GMode() ? "5G" : "2.4G");
+    }
+
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
     private void onResume() {
         mDeviceConn.getDeviceInfo();
@@ -193,6 +208,10 @@ public class SettingViewModel extends AndroidViewModel implements LifecycleObser
         return mWiFiSSid;
     }
 
+    public MutableLiveData<String> getWiFiMode() {
+        return mWiFiMode;
+    }
+
     public MutableLiveData<String> getSysLang() {
         return mSysLang;
     }
@@ -209,6 +228,10 @@ public class SettingViewModel extends AndroidViewModel implements LifecycleObser
         return mTitle;
     }
 
+    public MutableLiveData<Integer> getMsg() {
+        return mMsg;
+    }
+
     public void initData() {
         datas.clear();
         switch (Objects.requireNonNull(mMode.getValue())) {
@@ -223,11 +246,15 @@ public class SettingViewModel extends AndroidViewModel implements LifecycleObser
                 datas.add(mApplication.getResources().getString(R.string.british));
                 datas.add(mApplication.getResources().getString(R.string.us));
                 break;
+            case WIFI_MODE:
+                datas.add("5G");
+                datas.add("2.4G");
+                break;
         }
         mDatas.setValue(datas);
     }
 
-    public void initTitle() {
+    public void initTitleMsg() {
         switch (Objects.requireNonNull(mMode.getValue())) {
             case SYS_LANG:
                 mTitle.setValue(R.string.sys_lang);
@@ -237,6 +264,10 @@ public class SettingViewModel extends AndroidViewModel implements LifecycleObser
                 break;
             case WIFI:
                 mTitle.setValue(R.string.wifi_info);
+                break;
+            case WIFI_MODE:
+                mTitle.setValue(R.string.wifi_mode);
+                mMsg.setValue(R.string.wifi_mode_tip);
                 break;
         }
     }
@@ -249,13 +280,14 @@ public class SettingViewModel extends AndroidViewModel implements LifecycleObser
         switch (Objects.requireNonNull(mMode.getValue())) {
             case SYS_LANG:
                 mSysLang.setValue(Objects.requireNonNull(mDatas.getValue()).get(position));
-                mPosition.setValue(Objects.requireNonNull(mDatas.getValue()).indexOf(mSysLang.getValue()));
                 break;
             case UNIT:
                 mUnit.setValue(Objects.requireNonNull(mDatas.getValue()).get(position));
-                mPosition.setValue(Objects.requireNonNull(mDatas.getValue()).indexOf(mUnit.getValue()));
                 break;
+            case WIFI_MODE:
+                mWiFiMode.setValue(Objects.requireNonNull(mDatas.getValue()).get(position));
         }
+        mPosition.setValue(position);
     }
 
     public void ok() {
@@ -286,6 +318,9 @@ public class SettingViewModel extends AndroidViewModel implements LifecycleObser
             case WIFI:
                 mDeviceConn.setWiFiInfo(mWiFiSSid.getValue(), mPsd);
                 break;
+            case WIFI_MODE:
+                mDeviceConn.setWiFiMode(Objects.requireNonNull(mPosition.getValue()));
+                break;
         }
     }
 
@@ -300,12 +335,15 @@ public class SettingViewModel extends AndroidViewModel implements LifecycleObser
             case WIFI:
                 resetWiFi();
                 break;
+            case WIFI_MODE:
+                resetWiFiMode();
+                break;
         }
     }
 
     public void mode(SettingFragment.SetMode mode) {
         mMode.setValue(mode);
-        initTitle();
+        initTitleMsg();
         initData();
         resetPosition();
     }

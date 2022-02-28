@@ -37,6 +37,7 @@ public class SettingFragment extends Fragment {
         mSettingViewModel.getSysLang().observe(getViewLifecycleOwner(), lang -> binding.sysLang.setRightText(lang));
         mSettingViewModel.getUnit().observe(getViewLifecycleOwner(), unit -> binding.unit.setRightText(unit));
         mSettingViewModel.getWiFi().observe(getViewLifecycleOwner(), wifi -> binding.wifi.setRightText(wifi));
+        mSettingViewModel.getWiFiMode().observe(getViewLifecycleOwner(), wifi_mode -> binding.wifiMode.setRightText(wifi_mode));
 
         binding = FragmentSettingBinding.inflate(inflater, container, false);
         binding.setSettingViewModel(mSettingViewModel);
@@ -78,6 +79,11 @@ public class SettingFragment extends Fragment {
 
         public void setWiFi() {
             mSettingViewModel.mode(SetMode.WIFI);
+            showDialog();
+        }
+
+        public void setWiFiMode() {
+            mSettingViewModel.mode(SetMode.WIFI_MODE);
             showDialog();
         }
 
@@ -124,6 +130,7 @@ public class SettingFragment extends Fragment {
 
             mSettingViewModel.getPosition().observe(getViewLifecycleOwner(), adapter::select);
             mSettingViewModel.getTitle().observe(getViewLifecycleOwner(), mSetBind.title::setText);
+            mSettingViewModel.getMsg().observe(getViewLifecycleOwner(), mSetBind.setMsg::setText);
             mSettingViewModel.getRet().observe(getViewLifecycleOwner(), ret -> {
                 if (ret == 0 && mSetDialog != null) {
                     mSetDialog.dismiss();
@@ -135,6 +142,7 @@ public class SettingFragment extends Fragment {
                 mSetBind.listLl.setVisibility(View.GONE);
                 mSetBind.funcLl.setVisibility(View.GONE);
                 mSetBind.wifiLl.setVisibility(View.GONE);
+                mSetBind.setMsg.setVisibility(View.GONE);
                 switch (mode) {
                     case SYS_LANG:
                     case UNIT:
@@ -146,6 +154,12 @@ public class SettingFragment extends Fragment {
                         mSetBind.title.setVisibility(View.VISIBLE);
                         mSetBind.wifiLl.setVisibility(View.VISIBLE);
                         mSetBind.funcLl.setVisibility(View.VISIBLE);
+                        break;
+                    case WIFI_MODE:
+                        mSetBind.title.setVisibility(View.VISIBLE);
+                        mSetBind.listLl.setVisibility(View.VISIBLE);
+                        mSetBind.funcLl.setVisibility(View.VISIBLE);
+                        mSetBind.setMsg.setVisibility(View.VISIBLE);
                         break;
                 }
             });

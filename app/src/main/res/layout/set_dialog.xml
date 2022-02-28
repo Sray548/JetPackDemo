@@ -26,7 +26,17 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@color/black"
-                android:textSize="@dimen/text_size" />
+                android:textSize="@dimen/text_size"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/set_msg"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:textColor="@color/black"
+                android:textSize="@dimen/text_small"
+                android:visibility="gone" />
 
         </LinearLayout>
 
